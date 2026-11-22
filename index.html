@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+<meta name="theme-color" content="#fbe9dc">
+<title>Puffkins</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="game" hidden>
+  <div id="stage">
+    <img id="room" alt="">
+    <div id="fade"></div>
+    <div id="night"></div>
+    <div id="puffWrap">
+      <div id="shadow"></div>
+      <div id="puff">
+        <img id="puffImg" alt="" draggable="false">
+        <img id="puffDirty" alt="" draggable="false">
+      </div>
+      <div id="bubble" hidden><span id="bubbleIcon"></span></div>
+    </div>
+    <div id="fx"></div>
+  </div>
+
+  <header id="top">
+    <div id="nameRow">
+      <button id="prevBtn" class="navBtn" aria-label="prev">‹</button>
+      <div id="puffName"></div>
+      <button id="nextBtn" class="navBtn" aria-label="next">›</button>
+      <button id="menuBtn" class="iconBtn" aria-label="menu">⚙️</button>
+    </div>
+    <div id="dots"></div>
+    <div id="bars">
+      <div class="bar" data-stat="food"><span class="bi">🍓</span><div class="track"><div class="fill"></div></div></div>
+      <div class="bar" data-stat="fun"><span class="bi">😊</span><div class="track"><div class="fill"></div></div></div>
+      <div class="bar" data-stat="energy"><span class="bi">⚡</span><div class="track"><div class="fill"></div></div></div>
+      <div class="bar" data-stat="clean"><span class="bi">🫧</span><div class="track"><div class="fill"></div></div></div>
+    </div>
+  </header>
+
+  <nav id="actions">
+    <button class="act" data-act="feed"><span class="ai" id="foodIcon">🍃</span><span class="al" data-t="feed"></span></button>
+    <button class="act" data-act="play"><span class="ai">🧸</span><span class="al" data-t="play"></span></button>
+    <button class="act" data-act="bath"><span class="ai">🛁</span><span class="al" data-t="bath"></span></button>
+    <button class="act" data-act="sleep"><span class="ai" id="sleepIcon">🌙</span><span class="al" id="sleepLabel" data-t="sleep"></span></button>
+    <button class="act med" data-act="medicine" hidden><span class="ai">💊</span><span class="al" data-t="medicine"></span></button>
+  </nav>
+
+  <div id="bathBar" hidden>
+    <span data-t="rubHint"></span>
+    <button id="bathDone" data-t="done"></button>
+  </div>
+  <div id="toast"></div>
+</div>
+
+<!-- start screen -->
+<section id="start" class="screen">
+  <div class="card">
+    <h1 class="logo">Puffkins</h1>
+    <div id="startPuffs"></div>
+    <button id="playBtn" class="big" data-t="playGame"></button>
+    <div class="langRow">
+      <button class="langBtn" data-lang="hr">HR</button>
+      <button class="langBtn" data-lang="en">EN</button>
+    </div>
+  </div>
+</section>
+
+<!-- adopt screen -->
+<section id="adopt" class="screen" hidden>
+  <div class="card">
+    <h2 data-t="adoptTitle"></h2>
+    <div id="adoptChoices"></div>
+    <div id="nameStep" hidden>
+      <label for="nameInput" data-t="nameLabel"></label>
+      <input id="nameInput" maxlength="16" autocomplete="off">
+      <button id="adoptOk" class="big" data-t="adoptBtn"></button>
+    </div>
+    <button id="adoptCancel" class="link" data-t="back"></button>
+  </div>
+</section>
+
+<!-- menu -->
+<section id="menu" class="screen" hidden>
+  <div class="card">
+    <h2 data-t="settings"></h2>
+    <div class="row">
+      <span data-t="language"></span>
+      <div class="langRow">
+        <button class="langBtn" data-lang="hr">HR</button>
+        <button class="langBtn" data-lang="en">EN</button>
+      </div>
+    </div>
+    <button id="newPuffBtn" class="big" data-t="adoptNew"></button>
+    <button id="renameBtn" class="mid" data-t="rename"></button>
+    <button id="resetBtn" class="mid danger" data-t="reset"></button>
+    <button id="menuClose" class="big ghost" data-t="back"></button>
+    <p class="ver" id="ver"></p>
+  </div>
+</section>
+
+<script src="app.js"></script>
+</body>
+</html>
