@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION = '1.0.1';
+const APP_VERSION = '1.0.2';
 const SAVE_KEY = 'puffkins-save-v1';
 
 /* ---------- data ---------- */
@@ -372,6 +372,22 @@ function show(id) {
   ['start', 'adopt', 'menu'].forEach(s => $(s).hidden = s !== id);
   els.game.hidden = id === 'start' || id === 'adopt';
 }
+/* in-app history: browser/phone back button moves between game screens */
+function nav(id, how = 'push') {
+  const key = id || 'game';
+  if (how === 'push') history.pushState({ s: key }, '');
+  else if (how === 'replace') history.replaceState({ s: key }, '');
+  enter(key);
+}
+function enter(key) {
+  bathMode = false; anim = null;
+  if (key === 'adopt') buildAdopt();
+  if (key === 'menu') prepMenu();
+  if (key === 'game' && !S.puffs.length) key = 'start';
+  show(key === 'game' ? null : key);
+  if (key === 'game') { render(); updateZzz(); }
+}
+window.addEventListener('popstate', e => { if (e.state && e.state.s) enter(e.state.s); });
 function applyLang() {
   document.documentElement.lang = S.lang;
   document.querySelectorAll('[data-t]').forEach(e => e.textContent = tr(e.dataset.t));
@@ -381,13 +397,17 @@ function applyLang() {
 }
 let adoptSel = null;
 function playChoice(b) { b.classList.remove('boop'); void b.offsetWidth; b.classList.add('boop'); }
-function openAdopt() {
+let adoptOverGame = false;
+function openAdopt(how = 'push') {
+  adoptOverGame = S.puffs.length > 0;
+  nav('adopt', how);
+}
+function buildAdopt() {
   adoptSel = null;
   const owned = S.puffs.map(p => p.species);
   $('adoptChoices').innerHTML = ORDER.map(sp => `<button class="choice" data-sp="${sp}" ${owned.includes(sp) ? 'disabled' : ''}><img src="${img(sp, 'base')}" alt=""><span>${SPECIES[sp].name}</span></button>`).join('');
   $('nameStep').hidden = true;
   $('adoptCancel').hidden = S.puffs.length === 0;
-  show('adopt');
 }
 $('adoptChoices').addEventListener('click', e => {
   const b = e.target.closest('.choice'); if (!b || b.disabled) return;
@@ -404,20 +424,20 @@ $('adoptOk').addEventListener('click', () => {
     stats: { food: 70, fun: 70, energy: 85, clean: 90, health: 100 } });
   S.current = S.puffs.length - 1;
   preload(adoptSel); save();
-  show(null); render(); updateZzz();
+  if (adoptOverGame) history.back(); else nav(null, 'replace');
   Sfx.fanfare();
   setTimeout(() => { playClass('hop', 550); Sfx.boing(); burst(['💖', '✨', '⭐'], 6); toast(tr('newFriend').replace('{n}', name)); }, 300);
 });
-$('adoptCancel').addEventListener('click', () => show(null));
-$('playBtn').addEventListener('click', () => { if (!S.puffs.length) openAdopt(); else { show(null); render(); updateZzz(); } });
+$('adoptCancel').addEventListener('click', () => history.back());
+$('playBtn').addEventListener('click', () => { if (!S.puffs.length) openAdopt(); else nav(null); });
 document.querySelectorAll('.langBtn').forEach(b => b.addEventListener('click', () => { S.lang = b.dataset.lang; save(); applyLang(); }));
-$('menuBtn').addEventListener('click', () => {
+function prepMenu() {
   $('newPuffBtn').disabled = S.puffs.length >= ORDER.length;
   resetArm = false; $('resetBtn').classList.remove('confirm'); $('resetBtn').textContent = tr('reset');
-  show('menu');
-});
-$('menuClose').addEventListener('click', () => show(null));
-$('newPuffBtn').addEventListener('click', () => { if (S.puffs.length >= ORDER.length) toast(tr('allAdopted')); else openAdopt(); });
+}
+$('menuBtn').addEventListener('click', () => nav('menu'));
+$('menuClose').addEventListener('click', () => history.back());
+$('newPuffBtn').addEventListener('click', () => { if (S.puffs.length >= ORDER.length) toast(tr('allAdopted')); else openAdopt('replace'); });
 $('renameBtn').addEventListener('click', () => {
   const p = cur(); if (!p) return;
   const n = prompt(tr('renamePrompt'), p.name);
@@ -426,7 +446,7 @@ $('renameBtn').addEventListener('click', () => {
 let resetArm = false;
 $('resetBtn').addEventListener('click', () => {
   if (!resetArm) { resetArm = true; $('resetBtn').classList.add('confirm'); $('resetBtn').textContent = tr('resetConfirm'); return; }
-  const lang = S.lang; S = fresh(); S.lang = lang; save(); applyLang(); openAdopt();
+  const lang = S.lang; S = fresh(); S.lang = lang; save(); applyLang(); openAdopt('replace');
 });
 
 /* ---------- input ---------- */
@@ -492,6 +512,7 @@ simulate(Date.now() - S.t); S.t = Date.now();
 S.puffs.forEach(q => delete q.justWoke);
 if (S.puffs.length) { if (S.current >= S.puffs.length) S.current = 0; preload(cur().species); }
 applyLang();
+history.replaceState({ s: 'start' }, '');
 show('start');
 
 /* ---------- service worker (auto update) ---------- */
