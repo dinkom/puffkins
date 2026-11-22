@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION = '1.1.0';
+const APP_VERSION = '1.1.1';
 const SAVE_KEY = 'puffkins-save-v1';
 
 /* ---------- data ---------- */
@@ -23,7 +23,7 @@ const T = {
     full: 'Sit sam! 😋', yum: 'Njam njam!', cleanDone: 'Čist i mekan! ✨', sleeping: 'Pssst… spava 😴',
     cured: 'Bolje mi je! 💖', notTired: 'Nisam umoran! ☀️', tooTired: 'Preumoran sam… 😴', sickPlay: 'Bolestan sam… 🤒',
     allAdopted: 'Već imaš sve Puffove!', woke: 'Dobro jutro! ☀️', renamePrompt: 'Novo ime:', alreadyClean: 'Već sam čist! ✨',
-    newFriend: 'Dobrodošao, {n}! 💕', credit: 'Likove izmislila Klara ♡', sound: 'Zvuk', soundOn: 'Uključen', soundOff: 'Isključen',
+    newFriend: 'Dobrodošao, {n}! 💕', sound: 'Zvuk', soundOn: 'Uključen', soundOff: 'Isključen',
   },
   en: {
     feed: 'Food', play: 'Play', bath: 'Bath', sleep: 'Sleep', wake: 'Wake up', medicine: 'Medicine',
@@ -33,7 +33,7 @@ const T = {
     full: "I'm full! 😋", yum: 'Yum yum!', cleanDone: 'Clean and fluffy! ✨', sleeping: 'Shhh… sleeping 😴',
     cured: 'I feel better! 💖', notTired: "I'm not tired! ☀️", tooTired: 'Too tired… 😴', sickPlay: "I'm sick… 🤒",
     allAdopted: 'You already have all the Puffs!', woke: 'Good morning! ☀️', renamePrompt: 'New name:', alreadyClean: "I'm already clean! ✨",
-    newFriend: 'Welcome, {n}! 💕', credit: 'Characters created by Klara ♡', sound: 'Sound', soundOn: 'On', soundOff: 'Off',
+    newFriend: 'Welcome, {n}! 💕', sound: 'Sound', soundOn: 'On', soundOff: 'Off',
   },
 };
 
