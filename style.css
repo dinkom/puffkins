@@ -34,7 +34,7 @@ button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
 body.asleep #night{opacity:.45}
 #fx{position:absolute;inset:0;pointer-events:none;overflow:hidden}
 
-#puffWrap{position:absolute;left:50%;bottom:16.5%;width:56%;transform:translateX(-50%);transition:opacity .35s}
+#puffWrap{position:absolute;left:50%;bottom:max(16.5%, calc(env(safe-area-inset-bottom) + 132px));width:min(56%, 92vw, calc((100dvh - 360px) * 1.05));transform:translateX(-50%);transition:opacity .35s}
 #shadow{position:absolute;left:12%;right:8%;bottom:-2.2%;height:9%;border-radius:50%;background:radial-gradient(closest-side,rgba(110,60,60,.3),rgba(110,60,60,0))}
 #puff{position:relative;transform-origin:50% 100%;animation:breathe 3.2s ease-in-out infinite}
 #puffImg,#puffDirty{display:block;width:100%;height:auto;pointer-events:none}
