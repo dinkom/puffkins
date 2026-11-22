@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION = '1.0.2';
+const APP_VERSION = '1.1.0';
 const SAVE_KEY = 'puffkins-save-v1';
 
 /* ---------- data ---------- */
@@ -23,7 +23,7 @@ const T = {
     full: 'Sit sam! 😋', yum: 'Njam njam!', cleanDone: 'Čist i mekan! ✨', sleeping: 'Pssst… spava 😴',
     cured: 'Bolje mi je! 💖', notTired: 'Nisam umoran! ☀️', tooTired: 'Preumoran sam… 😴', sickPlay: 'Bolestan sam… 🤒',
     allAdopted: 'Već imaš sve Puffove!', woke: 'Dobro jutro! ☀️', renamePrompt: 'Novo ime:', alreadyClean: 'Već sam čist! ✨',
-    newFriend: 'Dobrodošao, {n}! 💕', sound: 'Zvuk', soundOn: 'Uključen', soundOff: 'Isključen',
+    newFriend: 'Dobrodošao, {n}! 💕', credit: 'Likove izmislila Klara ♡', sound: 'Zvuk', soundOn: 'Uključen', soundOff: 'Isključen',
   },
   en: {
     feed: 'Food', play: 'Play', bath: 'Bath', sleep: 'Sleep', wake: 'Wake up', medicine: 'Medicine',
@@ -33,7 +33,7 @@ const T = {
     full: "I'm full! 😋", yum: 'Yum yum!', cleanDone: 'Clean and fluffy! ✨', sleeping: 'Shhh… sleeping 😴',
     cured: 'I feel better! 💖', notTired: "I'm not tired! ☀️", tooTired: 'Too tired… 😴', sickPlay: "I'm sick… 🤒",
     allAdopted: 'You already have all the Puffs!', woke: 'Good morning! ☀️', renamePrompt: 'New name:', alreadyClean: "I'm already clean! ✨",
-    newFriend: 'Welcome, {n}! 💕', sound: 'Sound', soundOn: 'On', soundOff: 'Off',
+    newFriend: 'Welcome, {n}! 💕', credit: 'Characters created by Klara ♡', sound: 'Sound', soundOn: 'On', soundOff: 'Off',
   },
 };
 
@@ -162,6 +162,7 @@ function render() {
   els.name.textContent = p.name;
   $('foodIcon').textContent = SPECIES[sp].food;
   document.body.classList.toggle('asleep', !!p.asleep);
+  document.body.dataset.sp = sp;
   // image
   if (bathMode) {
     setPuffImg(img(sp, 'base'));
@@ -405,7 +406,7 @@ function openAdopt(how = 'push') {
 function buildAdopt() {
   adoptSel = null;
   const owned = S.puffs.map(p => p.species);
-  $('adoptChoices').innerHTML = ORDER.map(sp => `<button class="choice" data-sp="${sp}" ${owned.includes(sp) ? 'disabled' : ''}><img src="${img(sp, 'base')}" alt=""><span>${SPECIES[sp].name}</span></button>`).join('');
+  $('adoptChoices').innerHTML = ORDER.map(sp => `<button class="choice c-${sp}" data-sp="${sp}" ${owned.includes(sp) ? 'disabled' : ''}><img src="${img(sp, 'base')}" alt=""><span>${SPECIES[sp].name}</span></button>`).join('');
   $('nameStep').hidden = true;
   $('adoptCancel').hidden = S.puffs.length === 0;
 }

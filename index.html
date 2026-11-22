@@ -3,11 +3,12 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-<meta name="theme-color" content="#fbe9dc">
+<meta name="theme-color" content="#fff3f0">
 <title>Puffkins</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icons/icon-192.png">
 <link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preload" href="fonts/mplusrounded-800.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -37,8 +38,8 @@
     </div>
     <div id="dots"></div>
     <div id="bars">
-      <div class="bar" data-stat="food"><span class="bi">🍓</span><div class="track"><div class="fill"></div></div></div>
-      <div class="bar" data-stat="fun"><span class="bi">😊</span><div class="track"><div class="fill"></div></div></div>
+      <div class="bar" data-stat="food"><span class="bi">🍙</span><div class="track"><div class="fill"></div></div></div>
+      <div class="bar" data-stat="fun"><span class="bi">💖</span><div class="track"><div class="fill"></div></div></div>
       <div class="bar" data-stat="energy"><span class="bi">⚡</span><div class="track"><div class="fill"></div></div></div>
       <div class="bar" data-stat="clean"><span class="bi">🫧</span><div class="track"><div class="fill"></div></div></div>
     </div>
@@ -62,20 +63,21 @@
 <!-- start screen -->
 <section id="start" class="screen">
   <div class="card">
-    <h1 class="logo">Puffkins</h1>
-    <div id="startPuffs"></div>
+    <div class="logoWrap"><h1 class="logo"><span class="lg-s" aria-hidden="true">Puffkins</span><span class="lg-f">Puffkins</span></h1><div class="logoSub">パフキンズ</div></div>
+    <div class="stagePlate"><div id="startPuffs"></div></div>
     <button id="playBtn" class="big" data-t="playGame"></button>
     <div class="langRow">
       <button class="langBtn" data-lang="hr">HR</button>
       <button class="langBtn" data-lang="en">EN</button>
     </div>
+    <p class="credit" data-t="credit"></p>
   </div>
 </section>
 
 <!-- adopt screen -->
 <section id="adopt" class="screen" hidden>
   <div class="card">
-    <h2 data-t="adoptTitle"></h2>
+    <h2 class="ribbon" data-t="adoptTitle"></h2>
     <div id="adoptChoices"></div>
     <div id="nameStep" hidden>
       <label for="nameInput" data-t="nameLabel"></label>
@@ -89,7 +91,7 @@
 <!-- menu -->
 <section id="menu" class="screen" hidden>
   <div class="card">
-    <h2 data-t="settings"></h2>
+    <h2 class="ribbon" data-t="settings"></h2>
     <div class="row">
       <span data-t="language"></span>
       <div class="langRow">
