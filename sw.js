@@ -1,5 +1,5 @@
 // Bump VERSION on every deploy — the app reloads itself onto the new version.
-const VERSION = 'puffkins-v1.0.0';
+const VERSION = 'puffkins-v1.0.1';
 const ASSETS = [
   './', 'index.html', 'style.css', 'app.js', 'manifest.webmanifest',
   'icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png',

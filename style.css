@@ -118,3 +118,14 @@ h2{margin:0;font-size:24px}
 #nameStep{display:flex;flex-direction:column;gap:8px}
 #nameInput{font:inherit;font-size:20px;font-weight:700;text-align:center;padding:12px;border-radius:14px;border:2px solid var(--line);background:#fff;color:var(--ink);user-select:text;-webkit-user-select:text}
 .ver{margin:0;font-size:12px;color:var(--ink2)}
+
+/* juicy presses */
+.big,.mid,.langBtn,.navBtn,.iconBtn,.choice,#bathDone{transition:transform .12s cubic-bezier(.3,1.6,.5,1),box-shadow .12s}
+.mid:active,.langBtn:active,.navBtn:active,.iconBtn:active,#bathDone:active{transform:scale(.9)}
+.choice:active{transform:scale(.94)}
+.choice.boop{animation:boop .35s cubic-bezier(.3,1.6,.5,1)}
+@keyframes boop{0%{transform:scale(.9)}60%{transform:scale(1.06)}100%{transform:scale(1)}}
+.act:active{transform:scale(.88)}
+.act:active .ai{transform:scale(1.15) rotate(-6deg)}
+.ai{transition:transform .12s}
+#soundBtn{min-width:110px}

@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION = '1.0.0';
+const APP_VERSION = '1.0.1';
 const SAVE_KEY = 'puffkins-save-v1';
 
 /* ---------- data ---------- */
@@ -23,7 +23,7 @@ const T = {
     full: 'Sit sam! 😋', yum: 'Njam njam!', cleanDone: 'Čist i mekan! ✨', sleeping: 'Pssst… spava 😴',
     cured: 'Bolje mi je! 💖', notTired: 'Nisam umoran! ☀️', tooTired: 'Preumoran sam… 😴', sickPlay: 'Bolestan sam… 🤒',
     allAdopted: 'Već imaš sve Puffove!', woke: 'Dobro jutro! ☀️', renamePrompt: 'Novo ime:', alreadyClean: 'Već sam čist! ✨',
-    newFriend: 'Dobrodošao, {n}! 💕',
+    newFriend: 'Dobrodošao, {n}! 💕', sound: 'Zvuk', soundOn: 'Uključen', soundOff: 'Isključen',
   },
   en: {
     feed: 'Food', play: 'Play', bath: 'Bath', sleep: 'Sleep', wake: 'Wake up', medicine: 'Medicine',
@@ -33,9 +33,58 @@ const T = {
     full: "I'm full! 😋", yum: 'Yum yum!', cleanDone: 'Clean and fluffy! ✨', sleeping: 'Shhh… sleeping 😴',
     cured: 'I feel better! 💖', notTired: "I'm not tired! ☀️", tooTired: 'Too tired… 😴', sickPlay: "I'm sick… 🤒",
     allAdopted: 'You already have all the Puffs!', woke: 'Good morning! ☀️', renamePrompt: 'New name:', alreadyClean: "I'm already clean! ✨",
-    newFriend: 'Welcome, {n}! 💕',
+    newFriend: 'Welcome, {n}! 💕', sound: 'Sound', soundOn: 'On', soundOff: 'Off',
   },
 };
+
+
+/* ---------- sound (synthesized, no files) ---------- */
+const Sfx = (() => {
+  let ctx = null, master = null;
+  function ac() {
+    if (!ctx) {
+      const C = window.AudioContext || window.webkitAudioContext; if (!C) return null;
+      ctx = new C(); master = ctx.createGain(); master.gain.value = 0.55; master.connect(ctx.destination);
+    }
+    if (ctx.state === 'suspended') ctx.resume();
+    return ctx;
+  }
+  const on = () => S.sound !== false && ac();
+  function tone(f0, f1, dur, { type = 'sine', vol = 0.3, delay = 0, attack = 0.005 } = {}) {
+    const c = ctx, t = c.currentTime + delay;
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = type; o.frequency.setValueAtTime(f0, t);
+    if (f1 !== f0) o.frequency.exponentialRampToValueAtTime(f1, t + dur);
+    g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + attack);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g); g.connect(master); o.start(t); o.stop(t + dur + 0.02);
+  }
+  function noise(dur, { freq = 1200, q = 1, vol = 0.25, delay = 0 } = {}) {
+    const c = ctx, t = c.currentTime + delay;
+    const len = Math.floor(c.sampleRate * dur), buf = c.createBuffer(1, len, c.sampleRate), d = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * (1 - i / len);
+    const src = c.createBufferSource(), f = c.createBiquadFilter(), g = c.createGain();
+    src.buffer = buf; f.type = 'bandpass'; f.frequency.value = freq; f.Q.value = q; g.gain.value = vol;
+    src.connect(f); f.connect(g); g.connect(master); src.start(t);
+  }
+  return {
+    unlock() { ac(); },
+    click() { if (!on()) return; tone(900, 420, 0.07, { type: 'triangle', vol: 0.35 }); noise(0.03, { freq: 3000, vol: 0.12 }); },
+    select() { if (!on()) return; tone(520, 780, 0.09, { type: 'sine', vol: 0.3 }); tone(780, 1170, 0.12, { type: 'sine', vol: 0.25, delay: 0.07 }); },
+    pop() { if (!on()) return; tone(600 + Math.random() * 700, 1600 + Math.random() * 600, 0.06, { vol: 0.22 }); },
+    munch() { if (!on()) return; noise(0.07, { freq: 700, q: 2, vol: 0.4 }); noise(0.05, { freq: 1400, q: 2, vol: 0.25, delay: 0.09 }); },
+    boing() { if (!on()) return; tone(220, 660, 0.22, { type: 'sine', vol: 0.35 }); tone(330, 990, 0.18, { type: 'triangle', vol: 0.12 }); },
+    pet() { if (!on()) return; tone(1320, 1760, 0.12, { vol: 0.18 }); tone(1760, 2093, 0.15, { vol: 0.12, delay: 0.06 }); },
+    squeak() { if (!on()) return; tone(700, 1100, 0.1, { type: 'triangle', vol: 0.25 }); },
+    nope() { if (!on()) return; tone(330, 260, 0.12, { type: 'triangle', vol: 0.3 }); tone(300, 220, 0.14, { type: 'triangle', vol: 0.3, delay: 0.13 }); },
+    yum() { if (!on()) return; [784, 988, 1175].forEach((f, i) => tone(f, f, 0.12, { vol: 0.22, delay: i * 0.08 })); },
+    sparkle() { if (!on()) return; [1047, 1319, 1568, 2093, 2637].forEach((f, i) => tone(f, f * 1.01, 0.18, { vol: 0.16, delay: i * 0.06 })); },
+    fanfare() { if (!on()) return; [523, 659, 784, 1047].forEach((f, i) => tone(f, f, i === 3 ? 0.35 : 0.14, { type: 'triangle', vol: 0.28, delay: i * 0.11 })); },
+    sleep() { if (!on()) return; [784, 659, 523, 392].forEach((f, i) => tone(f, f, 0.3, { vol: 0.18, delay: i * 0.16, attack: 0.03 })); },
+    wake() { if (!on()) return; [392, 523, 659, 784].forEach((f, i) => tone(f, f, 0.18, { vol: 0.2, delay: i * 0.09 })); },
+    whoosh() { if (!on()) return; noise(0.3, { freq: 900, q: 0.7, vol: 0.18 }); },
+  };
+})();
 
 /* ---------- state ---------- */
 let S = load();
@@ -220,7 +269,7 @@ function updateZzz() {
 /* ---------- actions ---------- */
 async function feed() {
   const p = cur();
-  if (p.stats.food >= 95) { toast(tr('full')); playClass('wiggle', 500); return; }
+  if (p.stats.food >= 95) { Sfx.nope(); toast(tr('full')); playClass('wiggle', 500); return; }
   busy = true; render();
   const r = puffRect();
   const [mx, my] = MOUTH[p.species];
@@ -229,21 +278,22 @@ async function feed() {
   f.style.transform = 'translate(-50%,-50%)';
   await wait(60);
   f.style.transform = `translate(-50%,calc(-50% + ${r.height * (0.3 + my)}px)) scale(.5)`;
+  Sfx.whoosh();
   await wait(650); f.style.opacity = 0;
   for (let i = 0; i < 3; i++) {
-    anim = 'eat'; render(); await wait(380);
-    anim = 'chew'; render(); playClass('squish', 300); await wait(380);
+    anim = 'eat'; render(); Sfx.munch(); await wait(380);
+    anim = 'chew'; render(); Sfx.munch(); playClass('squish', 300); await wait(380);
   }
   p.stats.food = clamp(p.stats.food + 30); p.stats.fun = clamp(p.stats.fun + 3);
   anim = null; busy = false; buzz(20);
-  toast(tr('yum')); burst(['💛', '✨'], 3); save(); render();
+  Sfx.yum(); toast(tr('yum')); burst(['💛', '✨'], 3); save(); render();
 }
 async function play() {
   const p = cur();
-  if (p.sick) { toast(tr('sickPlay')); playClass('wiggle', 500); return; }
-  if (p.stats.energy < 10) { toast(tr('tooTired')); return; }
+  if (p.sick) { Sfx.nope(); toast(tr('sickPlay')); playClass('wiggle', 500); return; }
+  if (p.stats.energy < 10) { Sfx.nope(); toast(tr('tooTired')); return; }
   busy = true; anim = 'chew'; render();
-  for (let i = 0; i < 3; i++) { playClass('hop', 550); burst(['💖', '⭐', '✨'], 2); buzz(15); await wait(600); }
+  for (let i = 0; i < 3; i++) { playClass('hop', 550); Sfx.boing(); burst(['💖', '⭐', '✨'], 2); buzz(15); await wait(600); }
   p.stats.fun = clamp(p.stats.fun + 25);
   p.stats.energy = clamp(p.stats.energy - 8);
   p.stats.food = clamp(p.stats.food - 4);
@@ -252,15 +302,15 @@ async function play() {
 }
 function bath() {
   const p = cur();
-  if (p.stats.clean >= 97) { toast(tr('alreadyClean')); return; }
+  if (p.stats.clean >= 97) { Sfx.nope(); toast(tr('alreadyClean')); return; }
   bathMode = true; render(); toast(tr('rubHint'));
 }
 function endBath() { bathMode = false; save(); render(); }
 function toggleSleep() {
   const p = cur();
-  if (!p.asleep && p.stats.energy > 90) { toast(tr('notTired')); return; }
+  if (!p.asleep && p.stats.energy > 90) { Sfx.nope(); toast(tr('notTired')); return; }
   p.asleep = !p.asleep;
-  if (!p.asleep) toast(tr('woke'));
+  if (!p.asleep) { Sfx.wake(); toast(tr('woke')); } else Sfx.sleep();
   save(); render(); updateZzz();
 }
 async function medicine() {
@@ -276,15 +326,15 @@ async function medicine() {
   p.stats.health = clamp(p.stats.health + 70);
   if (p.stats.health >= 50) p.sick = false;
   busy = false; save(); render();
-  playClass('hop', 550); burst(['💖', '✨'], 5); toast(tr('cured'));
+  Sfx.sparkle(); playClass('hop', 550); burst(['💖', '✨'], 5); toast(tr('cured'));
 }
 
 let lastPet = 0;
 function pet(e) {
   const p = cur(); if (!p || busy || bathMode) return;
   const now = Date.now(); if (now - lastPet < 450) return; lastPet = now;
-  if (p.asleep) { const r = puffRect(); particle('z', r.left + r.width * 0.7, r.top + r.height * 0.3, 'zzz'); return; }
-  playClass('squish', 300);
+  if (p.asleep) { Sfx.squeak(); const r = puffRect(); particle('z', r.left + r.width * 0.7, r.top + r.height * 0.3, 'zzz'); return; }
+  playClass('squish', 300); Sfx.pet();
   particle(p.sick ? '🩹' : '💗', e.clientX, e.clientY, 'rise', (Math.random() - 0.5) * 40);
   p.stats.fun = clamp(p.stats.fun + 2); buzz(8); render();
 }
@@ -296,12 +346,12 @@ function rub(e) {
   const r = puffRect();
   if (e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom) return;
   const now = Date.now(); if (now - lastRub < 45) return; lastRub = now;
-  bubbleAt(e.clientX, e.clientY);
+  bubbleAt(e.clientX, e.clientY); if (Math.random() < 0.45) Sfx.pop();
   const p = cur();
   p.stats.clean = clamp(p.stats.clean + 1.3);
   render();
   if (p.stats.clean >= 100) {
-    bathMode = false; burst(['✨', '🫧', '💖'], 6); toast(tr('cleanDone')); playClass('hop', 550); buzz(30);
+    bathMode = false; Sfx.sparkle(); burst(['✨', '🫧', '💖'], 6); toast(tr('cleanDone')); playClass('hop', 550); buzz(30);
     save(); render();
   }
 }
@@ -326,9 +376,11 @@ function applyLang() {
   document.documentElement.lang = S.lang;
   document.querySelectorAll('[data-t]').forEach(e => e.textContent = tr(e.dataset.t));
   document.querySelectorAll('.langBtn').forEach(b => b.classList.toggle('on', b.dataset.lang === S.lang));
+  soundLabel();
   render();
 }
 let adoptSel = null;
+function playChoice(b) { b.classList.remove('boop'); void b.offsetWidth; b.classList.add('boop'); }
 function openAdopt() {
   adoptSel = null;
   const owned = S.puffs.map(p => p.species);
@@ -341,6 +393,7 @@ $('adoptChoices').addEventListener('click', e => {
   const b = e.target.closest('.choice'); if (!b || b.disabled) return;
   adoptSel = b.dataset.sp;
   document.querySelectorAll('.choice').forEach(c => c.classList.toggle('sel', c === b));
+  Sfx.select(); playChoice(b);
   $('nameStep').hidden = false;
   $('nameInput').value = SPECIES[adoptSel].name;
 });
@@ -352,7 +405,8 @@ $('adoptOk').addEventListener('click', () => {
   S.current = S.puffs.length - 1;
   preload(adoptSel); save();
   show(null); render(); updateZzz();
-  setTimeout(() => { playClass('hop', 550); burst(['💖', '✨', '⭐'], 6); toast(tr('newFriend').replace('{n}', name)); }, 300);
+  Sfx.fanfare();
+  setTimeout(() => { playClass('hop', 550); Sfx.boing(); burst(['💖', '✨', '⭐'], 6); toast(tr('newFriend').replace('{n}', name)); }, 300);
 });
 $('adoptCancel').addEventListener('click', () => show(null));
 $('playBtn').addEventListener('click', () => { if (!S.puffs.length) openAdopt(); else { show(null); render(); updateZzz(); } });
@@ -376,6 +430,14 @@ $('resetBtn').addEventListener('click', () => {
 });
 
 /* ---------- input ---------- */
+// generic click sound for every button (specific sounds play on top)
+document.addEventListener('pointerdown', e => {
+  Sfx.unlock();
+  const b = e.target.closest('button');
+  if (b && !b.disabled && !b.classList.contains('choice')) Sfx.click();
+}, true);
+function soundLabel() { $('soundBtn').textContent = S.sound === false ? tr('soundOff') : tr('soundOn'); $('soundBtn').classList.toggle('on', S.sound !== false); }
+$('soundBtn').addEventListener('click', () => { S.sound = S.sound === false; save(); soundLabel(); if (S.sound) Sfx.select(); });
 const ACTIONS = { feed, play, bath, sleep: toggleSleep, medicine };
 els.actions.addEventListener('click', e => {
   const b = e.target.closest('.act'); if (!b || b.disabled) return;
