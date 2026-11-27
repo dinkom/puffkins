@@ -1,5 +1,5 @@
 'use strict';
-const APP_VERSION = '1.1.2';
+const APP_VERSION = '1.1.3';
 const SAVE_KEY = 'puffkins-save-v1';
 
 /* ---------- data ---------- */
